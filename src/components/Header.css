@@ -1,5 +1,5 @@
 .header {
-    background-color: #020202;
+    background-color: #3d2817;
     display: flex;
     justify-content: center;
     position: fixed;
@@ -74,6 +74,7 @@ a {
 }
 
 .nav-button:hover {
-    background-color: #fff;
-    color: #020202;
+    background-color: #d4a574;
+    color: #3d2817;
+    border-color: #d4a574;
 }

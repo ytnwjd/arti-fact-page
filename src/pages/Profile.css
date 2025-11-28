@@ -10,7 +10,7 @@
     background-color: #fff;
     padding: 3rem 2.5rem;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(61, 40, 23, 0.15);
     width: 500px;
     margin: 0 auto;
 }
@@ -24,7 +24,7 @@
     width: 120px;
     height: 120px;
     border-radius: 50%;
-    background-color: #020202;
+    background-color: #3d2817;
     color: #fff;
     display: flex;
     align-items: center;
@@ -32,11 +32,11 @@
     margin: 0 auto 1.5rem;
     font-size: 3rem;
     font-weight: bold;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(61, 40, 23, 0.3);
 }
 
 .profile-header h1 {
-    color: #020202;
+    color: #3d2817;
     font-size: 1.75rem;
     margin: 0;
     font-weight: 600;
@@ -71,7 +71,7 @@
 }
 
 .info-item p {
-    color: #020202;
+    color: #3d2817;
     font-size: 1.1rem;
     margin: 0;
 }

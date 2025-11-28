@@ -10,7 +10,7 @@
     background-color: #fff;
     padding: 3rem 2.5rem;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(61, 40, 23, 0.15);
     width: 500px;
     margin: 0 auto;
 }
@@ -18,7 +18,7 @@
 .signup-box h1 {
     text-align: center;
     margin-bottom: 2.5rem;
-    color: #020202;
+    color: #3d2817;
     font-size: 1.75rem;
     font-weight: 600;
 }
@@ -61,11 +61,11 @@
 
 .form-group input:focus {
     outline: none;
-    border-color: #020202;
+    border-color: #d4a574;
 }
 
 .signup-button {
-    background-color: #020202;
+    background-color: #3d2817;
     color: #fff;
     padding: 0.75rem;
     border: none;
@@ -78,7 +78,7 @@
 }
 
 .signup-button:hover {
-    background-color: #333;
+    background-color: #5c4033;
 }
 
 .login-link {
@@ -89,9 +89,13 @@
 }
 
 .login-link a {
-    color: #020202;
+    color: #3d2817;
     text-decoration: none;
     font-weight: 500;
+}
+
+.login-link a:hover {
+    color: #d4a574;
 }
 
 .login-link a:hover {
