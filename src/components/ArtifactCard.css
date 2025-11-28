@@ -1,0 +1,131 @@
+.artifact-card {
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(61, 40, 23, 0.08);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.artifact-card:hover {
+    border-color: #d4a574;
+    box-shadow: 0 4px 16px rgba(61, 40, 23, 0.15);
+    transform: translateY(-4px);
+}
+
+.artifact-image-wrapper {
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
+    background-color: #f5f5f5;
+    position: relative;
+}
+
+.artifact-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.artifact-card:hover .artifact-image {
+    transform: scale(1.05);
+}
+
+.artifact-content {
+    padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.artifact-name {
+    color: #3d2817;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    line-height: 1.4;
+}
+
+.artifact-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.artifact-info-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #3d2817;
+    font-size: 0.9rem;
+    min-width: 90px;
+}
+
+.info-value {
+    color: #666;
+    font-size: 0.95rem;
+    flex: 1;
+}
+
+.display-true {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.display-false {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.favorite-row {
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #eee;
+    justify-content: center;
+}
+
+.favorite-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    transition: transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.favorite-button:hover {
+    transform: scale(1.2);
+}
+
+.favorite-button.favorited {
+    animation: heartBeat 0.3s ease;
+}
+
+@keyframes heartBeat {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.3);
+    }
+}
+
+/* 그리드 레이아웃을 위한 반응형 스타일 */
+@media (min-width: 768px) {
+    .artifact-card {
+        max-width: 100%;
+    }
+}
+
