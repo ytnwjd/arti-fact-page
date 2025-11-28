@@ -1,0 +1,133 @@
+.home-container {
+    min-height: calc(100vh - 70px);
+    padding: 70px 1rem 2rem;
+    background-color: #faf0e6;
+}
+
+.home-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.home-title {
+    text-align: center;
+    color: #3d2817;
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+}
+
+.artifacts-section {
+    margin-top: 2rem;
+}
+
+.artifacts-count {
+    color: #3d2817;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.artifacts-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+@media (max-width: 1200px) {
+    .artifacts-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .artifacts-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .artifacts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.no-results {
+    text-align: center;
+    padding: 4rem 1rem;
+    color: #666;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(61, 40, 23, 0.08);
+}
+
+.no-results p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+}
+
+.no-results-hint {
+    font-size: 0.9rem;
+    color: #999;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 3rem;
+    padding: 2rem 0;
+}
+
+.pagination-button {
+    background-color: #3d2817;
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.pagination-button:hover:not(:disabled) {
+    background-color: #5c4033;
+}
+
+.pagination-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.pagination-numbers {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.pagination-number {
+    background-color: #fff;
+    color: #3d2817;
+    padding: 0.75rem 1rem;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 44px;
+}
+
+.pagination-number:hover {
+    border-color: #d4a574;
+    background-color: #faf0e6;
+}
+
+.pagination-number.active {
+    background-color: #3d2817;
+    color: #fff;
+    border-color: #3d2817;
+}
+
