@@ -41,8 +41,7 @@ export default function Profile() {
                         <label>Member Since</label>
                         <p>{new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' })}</p>
                     </div>
-                </div>
-                <button className="edit-button">Edit Profile</button>
+                </div>            
             </div>
         </div>
     );
