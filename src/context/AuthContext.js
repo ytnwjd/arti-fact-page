@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext(null);
 
@@ -55,10 +55,10 @@ export function AuthProvider({ children }) {
         localStorage.removeItem('user');
     };
 
-    return (
-        <AuthContext.Provider value={{ user, login, signup, logout, loading }}>
-            {children}
-        </AuthContext.Provider>
+    return React.createElement(
+        AuthContext.Provider,
+        { value: { user, login, signup, logout, loading } },
+        children
     );
 }
 
