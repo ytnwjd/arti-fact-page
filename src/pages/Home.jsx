@@ -5,22 +5,26 @@ import './Home.css';
 
 const ITEMS_PER_PAGE = 16;
 
-// Age를 숫자로 변환 (필터링용)
-const parseAge = (age) => {
-    if (!age) return 0;
-    if (typeof age === 'number') {
-        return age;
+// Age 필터링
+const filterByAge = (age, period) => {
+    if (age == null) {
+        return period === 'unknown';
     }
-    const ageStr = age.toString().toUpperCase();
-    if (ageStr.includes('BC')) {
-        const num = parseInt(ageStr.replace(/[^0-9]/g, '')) || 0;
-        return -num;
-    } else if (ageStr.includes('AD')) {
-        const num = parseInt(ageStr.replace(/[^0-9]/g, '')) || 0;
-        return num;
+    
+    const ageNum = typeof age === 'number' ? age : parseInt(age);
+    
+    switch (period) {
+        case 'before1980':
+            return ageNum <= 1980;
+        case '1980to2000':
+            return ageNum > 1980 && ageNum <= 2000;
+        case 'after2000':
+            return ageNum > 2000;
+        case 'unknown':
+            return age == null;
+        default:
+            return true;
     }
-    const num = parseInt(ageStr.replace(/[^0-9]/g, '')) || 0;
-    return num;
 };
 
 export default function Home() {
@@ -42,6 +46,7 @@ export default function Home() {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
+                console.log(data.length);
                 
                 setArtifacts(Array.isArray(data) ? data : []);
             } catch (err) {
@@ -71,21 +76,9 @@ export default function Home() {
             );
         }
 
-        // 시대별 필터
+        // Age 필터
         if (selectedPeriod) {
-            const periodRanges = {
-                'ancient': [-4000, 400],
-                'medieval': [400, 1400],
-                'renaissance': [1400, 1600],
-                'modern': [1600, 2000]
-            };
-            const range = periodRanges[selectedPeriod];
-            if (range) {
-                filtered = filtered.filter(item => {
-                    const age = parseAge(item.age);
-                    return age >= range[0] && age <= range[1];
-                });
-            }
+            filtered = filtered.filter(item => filterByAge(item.age, selectedPeriod));
         }
 
         return filtered;
@@ -148,28 +141,28 @@ export default function Home() {
                     <div className="age-slider-container">
                         <div className="period-buttons">
                             <button
-                                className={`period-button ${selectedPeriod === 'ancient' ? 'active' : ''}`}
-                                onClick={() => handlePeriodClick('ancient')}
+                                className={`period-button ${selectedPeriod === 'before1980' ? 'active' : ''}`}
+                                onClick={() => handlePeriodClick('before1980')}
                             >
-                                고대(~4c)
+                                ~1980
                             </button>
                             <button
-                                className={`period-button ${selectedPeriod === 'medieval' ? 'active' : ''}`}
-                                onClick={() => handlePeriodClick('medieval')}
+                                className={`period-button ${selectedPeriod === '1980to2000' ? 'active' : ''}`}
+                                onClick={() => handlePeriodClick('1980to2000')}
                             >
-                                중세(4c~14c)
+                                1980~2000
                             </button>
                             <button
-                                className={`period-button ${selectedPeriod === 'renaissance' ? 'active' : ''}`}
-                                onClick={() => handlePeriodClick('renaissance')}
+                                className={`period-button ${selectedPeriod === 'after2000' ? 'active' : ''}`}
+                                onClick={() => handlePeriodClick('after2000')}
                             >
-                                르네상스(14c~16c)
+                                2000~
                             </button>
                             <button
-                                className={`period-button ${selectedPeriod === 'modern' ? 'active' : ''}`}
-                                onClick={() => handlePeriodClick('modern')}
+                                className={`period-button ${selectedPeriod === 'unknown' ? 'active' : ''}`}
+                                onClick={() => handlePeriodClick('unknown')}
                             >
-                                근대(16c~)
+                                알 수 없음
                             </button>
                         </div>
                     </div>
