@@ -1,6 +1,8 @@
 import { useState, useMemo, useEffect } from 'react';
 import ArtifactCard from '../components/ArtifactCard';
 import { API_BASE_URL } from '../config/api';
+import { useAuth } from '../context/AuthContext';
+import { refreshFavoritesCache } from '../utils/favorites';
 import './Home.css';
 
 const ITEMS_PER_PAGE = 16;
@@ -28,6 +30,7 @@ const filterByAge = (age, period) => {
 };
 
 export default function Home() {
+    const { user } = useAuth();
     const [currentPage, setCurrentPage] = useState(1);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedPeriod, setSelectedPeriod] = useState(null);
@@ -57,6 +60,13 @@ export default function Home() {
 
         fetchArtifacts();
     }, []);
+
+    // 사용자 관심목록 조회 및 캐시 업데이트
+    useEffect(() => {
+        if (user && user.userId) {
+            refreshFavoritesCache(user.userId);
+        }
+    }, [user]);
 
 
     const filteredData = useMemo(() => {

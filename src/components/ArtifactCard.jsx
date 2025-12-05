@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { isFavorite, addToFavorites, removeFromFavorites } from '../utils/favorites';
+import { isFavorite, toggleFavorite, refreshFavoritesCache } from '../utils/favorites';
 import ArtifactModal from './ArtifactModal';
 import './ArtifactCard.css';
 
@@ -26,26 +26,32 @@ export default function ArtifactCard({ artifact }) {
     } = artifact;
 
     useEffect(() => {
-        if (user && artId) {
-            setFavorite(isFavorite(artId));
-        } else {
-            setFavorite(false);
-        }
+        const checkFavorite = async () => {
+            if (user && user.userId && artId) {
+                // 관심목록 캐시가 없으면 먼저 가져오기
+                await refreshFavoritesCache(user.userId);
+                setFavorite(isFavorite(artId));
+            } else {
+                setFavorite(false);
+            }
+        };
+        checkFavorite();
     }, [user, artId]);
 
-    const handleFavoriteToggle = (e) => {
+    const handleFavoriteToggle = async (e) => {
         e.stopPropagation();
-        if (!user) {
+        if (!user || !user.userId) {
             alert('로그인이 필요합니다.');
             return;
         }
 
-        if (favorite) {
-            removeFromFavorites(artId);
-            setFavorite(false);
-        } else {
-            addToFavorites(artId);
-            setFavorite(true);
+        try {
+            await toggleFavorite(user.userId, artId);
+            // 토글 후 캐시 새로고침
+            await refreshFavoritesCache(user.userId);
+            setFavorite(isFavorite(artId));
+        } catch (error) {
+            alert('관심 목록 업데이트에 실패했습니다.');
         }
     };
 
@@ -113,6 +119,8 @@ export default function ArtifactCard({ artifact }) {
                 artifact={artifact}
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
+                favorite={favorite}
+                onFavoriteToggle={handleFavoriteToggle}
             />
         </>
     );

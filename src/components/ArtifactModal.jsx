@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { isFavorite, addToFavorites, removeFromFavorites } from '../utils/favorites';
+import { isFavorite, toggleFavorite, refreshFavoritesCache } from '../utils/favorites';
 import './ArtifactModal.css';
 
-export default function ArtifactModal({ artifact, isOpen, onClose }) {
+export default function ArtifactModal({ artifact, isOpen, onClose, favorite: initialFavorite, onFavoriteToggle }) {
     const { user } = useAuth();
-    const [favorite, setFavorite] = useState(false);
+    const [favorite, setFavorite] = useState(initialFavorite || false);
 
     const {
         artId,
@@ -22,12 +22,25 @@ export default function ArtifactModal({ artifact, isOpen, onClose }) {
     } = artifact || {};
 
     useEffect(() => {
-        if (user && artId) {
-            setFavorite(isFavorite(artId));
-        } else {
-            setFavorite(false);
+        const checkFavorite = async () => {
+            if (user && user.userId && artId) {
+                await refreshFavoritesCache(user.userId);
+                setFavorite(isFavorite(artId));
+            } else {
+                setFavorite(false);
+            }
+        };
+        if (isOpen) {
+            checkFavorite();
         }
     }, [user, artId, isOpen]);
+
+    // 부모 컴포넌트에서 전달된 favorite prop이 변경되면 업데이트
+    useEffect(() => {
+        if (initialFavorite !== undefined) {
+            setFavorite(initialFavorite);
+        }
+    }, [initialFavorite]);
 
     useEffect(() => {
         if (isOpen) {
@@ -40,19 +53,25 @@ export default function ArtifactModal({ artifact, isOpen, onClose }) {
         };
     }, [isOpen]);
 
-    const handleFavoriteToggle = (e) => {
+    const handleFavoriteToggle = async (e) => {
         e.stopPropagation();
-        if (!user) {
+        if (!user || !user.userId) {
             alert('로그인이 필요합니다.');
             return;
         }
 
-        if (favorite) {
-            removeFromFavorites(artId);
-            setFavorite(false);
+        // 부모 컴포넌트의 핸들러가 있으면 사용, 없으면 직접 처리
+        if (onFavoriteToggle) {
+            await onFavoriteToggle(e);
+            // 부모에서 favorite 상태가 업데이트되면 prop으로 전달됨
         } else {
-            addToFavorites(artId);
-            setFavorite(true);
+            try {
+                await toggleFavorite(user.userId, artId);
+                await refreshFavoritesCache(user.userId);
+                setFavorite(isFavorite(artId));
+            } catch (error) {
+                alert('관심 목록 업데이트에 실패했습니다.');
+            }
         }
     };
 
