@@ -8,10 +8,12 @@ export default function ArtifactModal({ artifact, isOpen, onClose }) {
     const [favorite, setFavorite] = useState(false);
 
     const {
-        id,
+        artId,
         name,
-        artist_ID,
-        gallery_ID,
+        artistId,
+        artistName,
+        galleryId,
+        galleryName,
         display,
         genre,
         theme,
@@ -20,12 +22,12 @@ export default function ArtifactModal({ artifact, isOpen, onClose }) {
     } = artifact || {};
 
     useEffect(() => {
-        if (user && id) {
-            setFavorite(isFavorite(id));
+        if (user && artId) {
+            setFavorite(isFavorite(artId));
         } else {
             setFavorite(false);
         }
-    }, [user, id, isOpen]);
+    }, [user, artId, isOpen]);
 
     useEffect(() => {
         if (isOpen) {
@@ -46,10 +48,10 @@ export default function ArtifactModal({ artifact, isOpen, onClose }) {
         }
 
         if (favorite) {
-            removeFromFavorites(id);
+            removeFromFavorites(artId);
             setFavorite(false);
         } else {
-            addToFavorites(id);
+            addToFavorites(artId);
             setFavorite(true);
         }
     };
@@ -89,7 +91,7 @@ export default function ArtifactModal({ artifact, isOpen, onClose }) {
                     <div className="modal-details">
                         <div className="modal-info-item">
                             <span className="modal-info-label">Age:</span>
-                            <span className="modal-info-value">{age || 'Unknown'}</span>
+                            <span className="modal-info-value">{age != null ? age : 'Unknown'}</span>
                         </div>
                         <div className="modal-info-item">
                             <span className="modal-info-label">Genre:</span>
@@ -100,17 +102,17 @@ export default function ArtifactModal({ artifact, isOpen, onClose }) {
                             <span className="modal-info-value">{theme || 'Unknown'}</span>
                         </div>
                         <div className="modal-info-item">
-                            <span className="modal-info-label">Artist ID:</span>
-                            <span className="modal-info-value">{artist_ID || 'Unknown'}</span>
+                            <span className="modal-info-label">작가:</span>
+                            <span className="modal-info-value">{artistName || artistId || 'Unknown'}</span>
                         </div>
                         <div className="modal-info-item">
-                            <span className="modal-info-label">Gallery ID:</span>
-                            <span className="modal-info-value">{gallery_ID || 'Unknown'}</span>
+                            <span className="modal-info-label">미술관:</span>
+                            <span className="modal-info-value">{galleryName || galleryId || 'Unknown'}</span>
                         </div>
                         <div className="modal-info-item">
                             <span className="modal-info-label">전시 여부:</span>
-                            <span className={`modal-info-value ${display ? 'display-true' : 'display-false'}`}>
-                                {display ? 'O' : 'X'}
+                            <span className={`modal-info-value ${display === true ? 'display-true' : 'display-false'}`}>
+                                {display === true ? 'O' : 'X'}
                             </span>
                         </div>
                     </div>

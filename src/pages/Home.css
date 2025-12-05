@@ -132,6 +132,40 @@
     }
 }
 
+.loading {
+    text-align: center;
+    padding: 4rem 1rem;
+    color: #3d2817;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(61, 40, 23, 0.08);
+}
+
+.loading p {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 500;
+}
+
+.error-message {
+    text-align: center;
+    padding: 4rem 1rem;
+    color: #dc3545;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(61, 40, 23, 0.08);
+}
+
+.error-message p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+}
+
+.error-hint {
+    font-size: 0.9rem;
+    color: #999;
+}
+
 .no-results {
     text-align: center;
     padding: 4rem 1rem;

@@ -1,71 +1,16 @@
 import { useState, useMemo, useEffect } from 'react';
 import ArtifactCard from '../components/ArtifactCard';
+import { API_BASE_URL } from '../config/api';
 import './Home.css';
-
-// 예시 데이터 (실제로는 API에서 가져와야 함)
-const sampleData = [
-    { 
-        id: 1, 
-        name: 'Ancient Vase', 
-        age: '3000 BC', 
-        genre: 'Pottery', 
-        theme: 'Ancient Civilization',
-        display: true,
-        artist_ID: 'ART001',
-        gallery_ID: 'GAL001',
-        imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400'
-    },
-    { 
-        id: 2, 
-        name: 'Bronze Statue', 
-        age: '500 BC', 
-        genre: 'Sculpture', 
-        theme: 'Classical Art',
-        display: true,
-        artist_ID: 'ART002',
-        gallery_ID: 'GAL002',
-        imageUrl: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=400'
-    },
-    { 
-        id: 3, 
-        name: 'Medieval Manuscript', 
-        age: '1200 AD', 
-        genre: 'Manuscript', 
-        theme: 'Medieval Period',
-        display: true,
-        artist_ID: 'ART003',
-        gallery_ID: 'GAL003',
-        imageUrl: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400'
-    },
-    { 
-        id: 4, 
-        name: 'Renaissance Painting', 
-        age: '1500 AD', 
-        genre: 'Painting', 
-        theme: 'Renaissance',
-        display: true,
-        artist_ID: 'ART004',
-        gallery_ID: 'GAL004',
-        imageUrl: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400'
-    },
-    { 
-        id: 5, 
-        name: 'Ancient Coin Collection', 
-        age: '200 BC', 
-        genre: 'Numismatics', 
-        theme: 'Ancient Currency',
-        display: false,
-        artist_ID: 'ART005',
-        gallery_ID: 'GAL005',
-        imageUrl: 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=400'
-    },
-];
 
 const ITEMS_PER_PAGE = 16;
 
-// Age를 숫자로 변환
+// Age를 숫자로 변환 (필터링용)
 const parseAge = (age) => {
     if (!age) return 0;
+    if (typeof age === 'number') {
+        return age;
+    }
     const ageStr = age.toString().toUpperCase();
     if (ageStr.includes('BC')) {
         const num = parseInt(ageStr.replace(/[^0-9]/g, '')) || 0;
@@ -74,23 +19,55 @@ const parseAge = (age) => {
         const num = parseInt(ageStr.replace(/[^0-9]/g, '')) || 0;
         return num;
     }
-    return 0;
+    const num = parseInt(ageStr.replace(/[^0-9]/g, '')) || 0;
+    return num;
 };
 
 export default function Home() {
     const [currentPage, setCurrentPage] = useState(1);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedPeriod, setSelectedPeriod] = useState(null);
+    const [artifacts, setArtifacts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    // API에서 데이터 가져오기
+    useEffect(() => {
+        const fetchArtifacts = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/arts`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                setArtifacts(Array.isArray(data) ? data : []);
+            } catch (err) {
+                console.error('Failed to fetch artifacts:', err);
+                setError(err.message);
+                setArtifacts([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchArtifacts();
+    }, []);
+
 
     const filteredData = useMemo(() => {
-        let filtered = sampleData;
+        let filtered = artifacts;
 
         // 검색 필터 (작가명, 미술관)
         if (searchQuery.trim()) {
             const query = searchQuery.toLowerCase();
             filtered = filtered.filter(item =>
-                item.artist_ID.toLowerCase().includes(query) ||
-                item.gallery_ID.toLowerCase().includes(query)
+                (item.artistId && item.artistId.toLowerCase().includes(query)) ||
+                (item.artistName && item.artistName.toLowerCase().includes(query)) ||
+                (item.galleryId && item.galleryId.toLowerCase().includes(query)) ||
+                (item.galleryName && item.galleryName.toLowerCase().includes(query))
             );
         }
 
@@ -112,7 +89,7 @@ export default function Home() {
         }
 
         return filtered;
-    }, [searchQuery, selectedPeriod]);
+    }, [artifacts, searchQuery, selectedPeriod]);
 
     // 총 페이지 수 계산
     const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
@@ -200,15 +177,22 @@ export default function Home() {
 
                 <div className="artifacts-section">
                     <div className="artifacts-header">
-                        <h2 className="artifacts-count">                        
-                            {totalPages > 1 && ` (Page ${currentPage} of ${totalPages})`}
-                        </h2>
+                        
                     </div>
                     
-                    {currentArtifacts.length > 0 ? (
+                    {loading ? (
+                        <div className="loading">
+                            <p>로딩 중...</p>
+                        </div>
+                    ) : error ? (
+                        <div className="error-message">
+                            <p>데이터를 불러오는 중 오류가 발생했습니다.</p>
+                            <p className="error-hint">{error}</p>
+                        </div>
+                    ) : currentArtifacts.length > 0 ? (
                         <div className="artifacts-grid">
                             {currentArtifacts.map((artifact) => (
-                                <ArtifactCard key={artifact.id} artifact={artifact} />
+                                <ArtifactCard key={artifact.artId} artifact={artifact} />
                             ))}
                         </div>
                     ) : (
