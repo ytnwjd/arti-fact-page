@@ -7,15 +7,16 @@ export default function Signup() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [birthDate, setBirthDate] = useState('');
     const [error, setError] = useState('');
     const { signup } = useAuth();
     const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
 
-        if (!name || !email || !password) {
+        if (!name || !email || !password || !birthDate) {
             setError('모든 필드를 입력해주세요.');
             return;
         }
@@ -25,7 +26,7 @@ export default function Signup() {
             return;
         }
 
-        const result = signup(name, email, password);
+        const result = await signup(name, email, password, birthDate);
         if (result.success) {
             navigate('/profile');
         } else {
@@ -87,6 +88,19 @@ export default function Signup() {
                         placeholder: 'Enter your password (min 6 characters)',
                         value: password,
                         onChange: (e) => setPassword(e.target.value),
+                        required: true
+                    })
+                ),
+                React.createElement(
+                    'div',
+                    { className: 'form-group' },
+                    React.createElement('label', { htmlFor: 'birthDate' }, 'Birth Date'),
+                    React.createElement('input', {
+                        type: 'date',
+                        id: 'birthDate',
+                        name: 'birthDate',
+                        value: birthDate,
+                        onChange: (e) => setBirthDate(e.target.value),
                         required: true
                     })
                 ),

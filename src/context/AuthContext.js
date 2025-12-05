@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config/api';
 
 const AuthContext = createContext(null);
 
@@ -15,39 +16,79 @@ export function AuthProvider({ children }) {
         setLoading(false);
     }, []);
 
-    const login = (email, password) => {
-        // api 호출로 추후에 변경 필요
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        const foundUser = users.find(u => u.email === email && u.password === password);
+    const login = async (email, password) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/users/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                return { success: false, message: data.message || '로그인에 실패했습니다.' };
+            }
+
+            // 응답 형식: { userId, email, name, birthDate }
+            if (!data.userId) {
+                return { success: false, message: '로그인 응답에 userId가 없습니다.' };
+            }
         
-        if (foundUser) {
-            const userData = { email: foundUser.email, name: foundUser.name };
+            const userData = {
+                userId: data.userId,
+                email: data.email,
+                name: data.name,
+                birthDate: data.birthDate
+            };
+            
             setUser(userData);
             localStorage.setItem('user', JSON.stringify(userData));
+
             return { success: true };
+        } catch (error) {
+            return { success: false, message: '서버 연결에 실패했습니다. 다시 시도해주세요.' };
         }
-        return { success: false, message: '이메일 또는 비밀번호가 올바르지 않습니다.' };
     };
 
-    const signup = (name, email, password) => {
-       
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const signup = async (name, email, password, birthDate) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/users`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email,
+                    password,
+                    name,
+                    birthDate
+                }),
+            });
 
-        if (users.find(u => u.email === email)) {
-            return { success: false, message: '이미 존재하는 이메일입니다.' };
+            const data = await response.json();
+
+            if (!response.ok) {
+                return { success: false, message: data.message || '회원가입에 실패했습니다.' };
+            }
+
+            // API 응답에서 사용자 정보와 토큰 추출
+            const userData = data.user || data.data || data;
+            const token = data.token || data.accessToken;
+
+            // 사용자 정보와 토큰 저장
+            setUser(userData);
+            localStorage.setItem('user', JSON.stringify(userData));
+            if (token) {
+                localStorage.setItem('token', token);
+            }
+
+            return { success: true };
+        } catch (error) {
+            return { success: false, message: '서버 연결에 실패했습니다. 다시 시도해주세요.' };
         }
-
-        // 새 사용자 추가
-        const newUser = { name, email, password };
-        users.push(newUser);
-        localStorage.setItem('users', JSON.stringify(users));
-
-        // 자동 로그인
-        const userData = { email, name };
-        setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
-        
-        return { success: true };
     };
 
     const logout = () => {

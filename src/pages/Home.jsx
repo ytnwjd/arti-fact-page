@@ -46,11 +46,8 @@ export default function Home() {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
-                console.log(data.length);
-                
                 setArtifacts(Array.isArray(data) ? data : []);
             } catch (err) {
-                console.error('Failed to fetch artifacts:', err);
                 setError(err.message);
                 setArtifacts([]);
             } finally {
