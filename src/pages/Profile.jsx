@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { API_BASE_URL } from '../config/api';
+import { getFavorites } from '../utils/favorites';
+import ArtifactModal from '../components/ArtifactModal';
 import './Profile.css';
 
 export default function Profile() {
@@ -16,6 +18,11 @@ export default function Profile() {
     const [passwordError, setPasswordError] = useState('');
     const [passwordSuccess, setPasswordSuccess] = useState(false);
     const [updating, setUpdating] = useState(false);
+    const [favorites, setFavorites] = useState([]);
+    const [favoritesLoading, setFavoritesLoading] = useState(false);
+    const [selectedArtifact, setSelectedArtifact] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [artifactLoading, setArtifactLoading] = useState(false);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -54,6 +61,45 @@ export default function Profile() {
 
         if (!loading) {
             fetchProfile();
+        }
+    }, [user, loading]);
+
+    // 관심목록 가져오기
+    useEffect(() => {
+        const fetchFavorites = async () => {
+            if (!user || !user.userId) {
+                return;
+            }
+
+            try {
+                setFavoritesLoading(true);
+                const favoritesData = await getFavorites(user.userId);
+                
+                // 응답: { likedId, artId, artName, imageUrl, artistName, galleryName }
+                const artifacts = favoritesData.map(liked => ({
+                    artId: liked.artId,
+                    name: liked.artName, // artName을 name으로 매핑
+                    artistName: liked.artistName,
+                    galleryName: liked.galleryName,
+                    imageUrl: liked.imageUrl,
+                    // 응답에 없는 필드들은 null 또는 기본값
+                    genre: null,
+                    theme: null,
+                    age: null,
+                    display: null,
+                    artistId: null,
+                    galleryId: null
+                }));
+                setFavorites(artifacts);
+            } catch (err) {
+                setFavorites([]);
+            } finally {
+                setFavoritesLoading(false);
+            }
+        };
+
+        if (!loading && user?.userId) {
+            fetchFavorites();
         }
     }, [user, loading]);
 
@@ -159,11 +205,57 @@ export default function Profile() {
 
     return (
         <div className="profile-container">
+            {/* 관심목록 섹션 */}
+            {user?.userId && (
+                <div className="favorites-section">
+                    <h2 className="favorites-title">내 관심목록</h2>
+                    {favoritesLoading ? (
+                        <div className="favorites-loading">
+                            <p>로딩 중...</p>
+                        </div>
+                    ) : favorites.length > 0 ? (
+                        <div className="favorites-list">
+                            {favorites.map((artifact) => (
+                                <div
+                                    key={artifact.artId}
+                                    className="favorite-item"
+                                    onClick={async () => {
+                                        try {
+                                            setArtifactLoading(true);
+                                            // 작품 상세 정보 가져오기
+                                            const response = await fetch(`${API_BASE_URL}/api/arts/${artifact.artId}`);
+                                            if (!response.ok) {
+                                                throw new Error(`HTTP error! status: ${response.status}`);
+                                            }
+                                            const artData = await response.json();
+                                            setSelectedArtifact(artData);
+                                            setIsModalOpen(true);
+                                        } catch (err) {
+                                            alert('작품 정보를 불러오는 중 오류가 발생했습니다.');
+                                            // 에러 발생 시 기본 데이터 사용
+                                            setSelectedArtifact(artifact);
+                                            setIsModalOpen(true);
+                                        } finally {
+                                            setArtifactLoading(false);
+                                        }
+                                    }}
+                                >
+                                    <span className="favorite-text">
+                                        {artifact.name || 'Unnamed Artifact'} - {artifact.artistName || 'Unknown'}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="favorites-empty">
+                            <p>관심목록이 비어있습니다.</p>
+                        </div>
+                    )}
+                </div>
+            )}
+
             <div className="profile-box">
-                <div className="profile-header">
-                    <div className="profile-avatar">
-                        <span>{initial}</span>
-                    </div>
+                <div className="profile-header">                    
                     <h1>User Profile</h1>
                 </div>
                 <div className="profile-info">
@@ -252,6 +344,40 @@ export default function Profile() {
                         </form>
                     </div>
                 </div>
+            )}
+
+            {/* 작품 상세 모달 */}
+            {selectedArtifact && (
+                <ArtifactModal
+                    artifact={selectedArtifact}
+                    isOpen={isModalOpen}
+                    onClose={async () => {
+                        setIsModalOpen(false);
+                        setSelectedArtifact(null);
+                        // 모달 닫을 때 관심목록 새로고침
+                        if (user?.userId) {
+                            try {
+                                const favoritesData = await getFavorites(user.userId);
+                                const artifacts = favoritesData.map(liked => ({
+                                    artId: liked.artId,
+                                    name: liked.artName,
+                                    artistName: liked.artistName,
+                                    galleryName: liked.galleryName,
+                                    imageUrl: liked.imageUrl,
+                                    genre: null,
+                                    theme: null,
+                                    age: null,
+                                    display: null,
+                                    artistId: null,
+                                    galleryId: null
+                                }));
+                                setFavorites(artifacts);
+                            } catch (err) {
+                                // 에러 무시
+                            }
+                        }
+                    }}
+                />
             )}
         </div>
     );
