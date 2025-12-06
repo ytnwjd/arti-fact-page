@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { isFavorite, toggleFavorite, refreshFavoritesCache } from '../utils/favorites';
 import './ArtifactModal.css';
 
 export default function ArtifactModal({ artifact, isOpen, onClose, favorite: initialFavorite, onFavoriteToggle }) {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [favorite, setFavorite] = useState(initialFavorite || false);
 
     const {
@@ -122,11 +124,37 @@ export default function ArtifactModal({ artifact, isOpen, onClose, favorite: ini
                         </div>
                         <div className="modal-info-item">
                             <span className="modal-info-label">작가:</span>
-                            <span className="modal-info-value">{artistName || artistId || 'Unknown'}</span>
+                            <div className="modal-info-value-with-button">
+                                <span className="modal-info-value">{artistName || artistId || 'Unknown'}</span>
+                                {artistName && (
+                                    <button
+                                        className="detail-button"
+                                        onClick={() => {
+                                            onClose();
+                                            navigate(`/detail/artist?name=${encodeURIComponent(artistName)}`);
+                                        }}
+                                    >
+                                        상세 정보 보기
+                                    </button>
+                                )}
+                            </div>
                         </div>
                         <div className="modal-info-item">
                             <span className="modal-info-label">미술관:</span>
-                            <span className="modal-info-value">{galleryName || galleryId || 'Unknown'}</span>
+                            <div className="modal-info-value-with-button">
+                                <span className="modal-info-value">{galleryName || galleryId || 'Unknown'}</span>
+                                {galleryName && (
+                                    <button
+                                        className="detail-button"
+                                        onClick={() => {
+                                            onClose();
+                                            navigate(`/detail/gallery?name=${encodeURIComponent(galleryName)}`);
+                                        }}
+                                    >
+                                        상세 정보 보기
+                                    </button>
+                                )}
+                            </div>
                         </div>
                         <div className="modal-info-item">
                             <span className="modal-info-label">전시 여부:</span>

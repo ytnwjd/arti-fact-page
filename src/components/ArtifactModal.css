@@ -130,7 +130,7 @@
 
 .modal-info-item {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 1rem;
     padding-bottom: 1.25rem;
     border-bottom: 1px solid #eee;
@@ -152,6 +152,8 @@
     color: #666;
     font-size: 1.1rem;
     flex: 1;
+    display: flex;
+    align-items: center;
 }
 
 .modal-info-value.display-true {
@@ -162,6 +164,31 @@
 .modal-info-value.display-false {
     color: #dc3545;
     font-weight: 600;
+}
+
+.modal-info-value-with-button {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.detail-button {
+    background-color: #d4a574;
+    color: #3d2817;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.detail-button:hover {
+    background-color: #3d2817;
+    color: #fff;
 }
 
 @media (max-width: 768px) {
