@@ -139,22 +139,34 @@ export default function Detail() {
                                     <p>{data.name}</p>
                                 </div>
                             )}
-                            {data.location && (
-                                <div className="detail-item">
-                                    <label>위치:</label>
-                                    <p>{data.location}</p>
-                                </div>
-                            )}
                             {data.address && (
                                 <div className="detail-item">
                                     <label>주소:</label>
                                     <p>{data.address}</p>
                                 </div>
                             )}
-                            {data.description && (
+                            {data.openTime && (
                                 <div className="detail-item">
-                                    <label>설명:</label>
-                                    <p>{data.description}</p>
+                                    <label>오픈 시간:</label>
+                                    <p>{data.openTime}</p>
+                                </div>
+                            )}
+                            {data.closedTime && (
+                                <div className="detail-item">
+                                    <label>마감 시간:</label>
+                                    <p>{data.closedTime}</p>
+                                </div>
+                            )}
+                            {data.fee != null && (
+                                <div className="detail-item">
+                                    <label>입장료:</label>
+                                    <p>{data.fee.toLocaleString()}원</p>
+                                </div>
+                            )}
+                            {data.phone && (
+                                <div className="detail-item">
+                                    <label>전화번호:</label>
+                                    <p>{data.phone}</p>
                                 </div>
                             )}
                         </>
