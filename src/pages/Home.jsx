@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { refreshFavoritesCache } from '../utils/favorites';
 import './Home.css';
 
-const ITEMS_PER_PAGE = 16;
+const ITEMS_PER_PAGE = 12;
 
 // Age 필터링
 const filterByAge = (age, period) => {
@@ -37,6 +37,9 @@ export default function Home() {
     const [artifacts, setArtifacts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedGenres, setSelectedGenres] = useState([]);
+    const [selectedThemes, setSelectedThemes] = useState([]);
+    const [selectedDisplay, setSelectedDisplay] = useState([]);
 
     // API에서 데이터 가져오기
     useEffect(() => {
@@ -69,6 +72,23 @@ export default function Home() {
     }, [user]);
 
 
+    // Genre, Theme 값 추출
+    const uniqueGenres = useMemo(() => {
+        const genres = new Set();
+        artifacts.forEach(item => {
+            if (item.genre) genres.add(item.genre);
+        });
+        return Array.from(genres).sort();
+    }, [artifacts]);
+
+    const uniqueThemes = useMemo(() => {
+        const themes = new Set();
+        artifacts.forEach(item => {
+            if (item.theme) themes.add(item.theme);
+        });
+        return Array.from(themes).sort();
+    }, [artifacts]);
+
     const filteredData = useMemo(() => {
         let filtered = artifacts;
 
@@ -88,8 +108,31 @@ export default function Home() {
             filtered = filtered.filter(item => filterByAge(item.age, selectedPeriod));
         }
 
+        // Genre 필터
+        if (selectedGenres.length > 0) {
+            filtered = filtered.filter(item => 
+                item.genre && selectedGenres.includes(item.genre)
+            );
+        }
+
+        // Theme 필터
+        if (selectedThemes.length > 0) {
+            filtered = filtered.filter(item => 
+                item.theme && selectedThemes.includes(item.theme)
+            );
+        }
+
+        // 전시 여부 필터
+        if (selectedDisplay.length > 0) {
+            filtered = filtered.filter(item => {
+                if (selectedDisplay.includes('true') && item.display === true) return true;
+                if (selectedDisplay.includes('false') && item.display === false) return true;
+                return false;
+            });
+        }
+
         return filtered;
-    }, [artifacts, searchQuery, selectedPeriod]);
+    }, [artifacts, searchQuery, selectedPeriod, selectedGenres, selectedThemes, selectedDisplay]);
 
     // 총 페이지 수 계산
     const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
@@ -103,7 +146,31 @@ export default function Home() {
 
     useEffect(() => {
         setCurrentPage(1);
-    }, [searchQuery, selectedPeriod]);
+    }, [searchQuery, selectedPeriod, selectedGenres, selectedThemes, selectedDisplay]);
+
+    const handleGenreToggle = (genre) => {
+        setSelectedGenres(prev => 
+            prev.includes(genre) 
+                ? prev.filter(g => g !== genre)
+                : [...prev, genre]
+        );
+    };
+
+    const handleThemeToggle = (theme) => {
+        setSelectedThemes(prev => 
+            prev.includes(theme) 
+                ? prev.filter(t => t !== theme)
+                : [...prev, theme]
+        );
+    };
+
+    const handleDisplayToggle = (display) => {
+        setSelectedDisplay(prev => 
+            prev.includes(display) 
+                ? prev.filter(d => d !== display)
+                : [...prev, display]
+        );
+    };
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
@@ -120,6 +187,69 @@ export default function Home() {
 
     return (
         <div className="home-container">
+            <div className="home-content-wrapper">
+            {/* 필터 사이드바 */}
+            <div className="filter-sidebar">
+                <h3 className="filter-title">필터</h3>
+                
+                {/* Genre 필터 */}
+                <div className="filter-group">
+                    <h4 className="filter-group-title">Genre</h4>
+                    <div className="filter-options">
+                        {uniqueGenres.map(genre => (
+                            <label key={genre} className="filter-checkbox">
+                                <input
+                                    type="checkbox"
+                                    checked={selectedGenres.includes(genre)}
+                                    onChange={() => handleGenreToggle(genre)}
+                                />
+                                <span>{genre}</span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Theme 필터 */}
+                <div className="filter-group">
+                    <h4 className="filter-group-title">Theme</h4>
+                    <div className="filter-options">
+                        {uniqueThemes.map(theme => (
+                            <label key={theme} className="filter-checkbox">
+                                <input
+                                    type="checkbox"
+                                    checked={selectedThemes.includes(theme)}
+                                    onChange={() => handleThemeToggle(theme)}
+                                />
+                                <span>{theme}</span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
+
+                {/* 전시 여부 필터 */}
+                <div className="filter-group">
+                    <h4 className="filter-group-title">전시 여부</h4>
+                    <div className="filter-options">
+                        <label className="filter-checkbox">
+                            <input
+                                type="checkbox"
+                                checked={selectedDisplay.includes('true')}
+                                onChange={() => handleDisplayToggle('true')}
+                            />
+                            <span>전시 중</span>
+                        </label>
+                        <label className="filter-checkbox">
+                            <input
+                                type="checkbox"
+                                checked={selectedDisplay.includes('false')}
+                                onChange={() => handleDisplayToggle('false')}
+                            />
+                            <span>전시 안 함</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
             <div className="home-content">
                 <h1 className="home-title">Artifact Collection</h1>
 
@@ -234,6 +364,7 @@ export default function Home() {
                         </div>
                     )}
                 </div>
+            </div>
             </div>
         </div>
     );
